@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdbool.h>
 
-void fReadTask(FILE *pLibrary);
+void fReadToPrintTask(FILE *pLibrary);
 
 void fUpdateTask(FILE *pLibrary);
 
@@ -31,7 +31,7 @@ int main()
     switch (task)
     {
     case 1:
-        fReadTask(pLibrary);
+        fReadToPrintTask(pLibrary);
         break;
 
     case 2:
@@ -46,7 +46,7 @@ int main()
     return 0;
 }
 
-void fReadTask(FILE *pLibrary)
+void fReadToPrintTask(FILE *pLibrary)
 {
     char c;
 
@@ -69,17 +69,16 @@ void fUpdateTask(FILE *pLibrary)
     char aob;
     struct stLibSys books[100];
 
-    printf("1 - To borrow a book;\n2 - To return a book.");
-
-    do
-    {
-        scanf("%d", &updateTask);
-    } while ((updateTask != 1) && (updateTask != 2));
-
-    for (i = 0; i < 100; i++)
+    while (i == 770000)
     {
         printf("What is the book's name?\n");
         fgets(books[i].bookName, 100, stdin);
+
+        printf("1 - To borrow a book;\n2 - To return a book.");
+        do
+        {
+            scanf("%d", &updateTask);
+        } while ((updateTask != 1) && (updateTask != 2));
 
         printf("How many?\n");
         scanf("%d", &books[i].bookQuantity);
@@ -99,9 +98,10 @@ void fUpdateTask(FILE *pLibrary)
 
         if (!fAnyOtherBook())
         {
-            i += 100;
+            i = 770000;
         }
 
+        i++;
         count++;
     }
 
