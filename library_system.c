@@ -1,134 +1,165 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-#include <stdbool.h>
 
-void fReadToPrintTask(FILE *pLibrary);
+int fOperationToDo();
 
-void fUpdateTask(FILE *pLibrary);
+void fList();
 
-bool fAnyOtherBook();
-
-struct stLibSys
-{
-    char bookName[100];
-    int bookQuantity;
-};
+void fUpdate();
 
 int main()
 {
-    FILE *pLibrary;
-    pLibrary = fopen("library.csv", "a+");
+    //FILE * fpLibrary;
 
-    int task = 0;
+    int operationChoosed = fOperationToDo();
 
-    printf("1 - To list the library;\n2 - To Borrow/Return a book.");
-
-    do
-    {
-        scanf("%d", &task);
-    } while ((task != 1) && (task != 2));
-
-    switch (task)
+    switch (operationChoosed)
     {
     case 1:
-        fReadToPrintTask(pLibrary);
+        fList();
         break;
 
     case 2:
-        fUpdateTask(pLibrary);
+        fUpdate();
         break;
 
     default:
-        printf("Task Error.");
+        printf("operationChoosed error.\n");
         break;
     }
 
     return 0;
 }
 
-void fReadToPrintTask(FILE *pLibrary)
+int fOperationToDo()
 {
-    char c;
+    int operation = 0;
 
-    if (pLibrary)
-    {
-        while ((c = getc(pLibrary)) != EOF)
-        {
-            printf("%c", c);
-        }
-    }
-    else
-    {
-        printf("File not found.");
-    }
-};
-
-void fUpdateTask(FILE *pLibrary)
-{
-    int updateTask = 0, i = 0, count = 0;
-    char aob;
-    struct stLibSys books[100];
-
-    while (i == 770000)
-    {
-        printf("What is the book's name?\n");
-        fgets(books[i].bookName, 100, stdin);
-
-        printf("1 - To borrow a book;\n2 - To return a book.");
-        do
-        {
-            scanf("%d", &updateTask);
-        } while ((updateTask != 1) && (updateTask != 2));
-
-        printf("How many?\n");
-        scanf("%d", &books[i].bookQuantity);
-        getchar();
-
-        if (updateTask == 1)
-        {
-        }
-        else if (updateTask == 2)
-        {
-            /* code */
-        }
-        else
-        {
-            printf("Error in UpdateTask.\n");
-        }
-
-        if (!fAnyOtherBook())
-        {
-            i = 770000;
-        }
-
-        i++;
-        count++;
-    }
-
-    /*if (pLibrary){
-        fseek(pLibrary, 1*sizeof(struct stLibSys), SEEK_SET);
-
-    }
-    else{
-        printf("File not found.\n");
-    }*/
-}
-
-bool fAnyOtherBook()
-{
-    char aob, rest[10];
-
-    printf("Any other book? (y = yes, n = no)\n");
+    printf("1 - To list the library;\n2 - To update the library;\n\n");
 
     do
     {
-        /*scanf("%c", &aob);
-        getchar();*/
+        scanf("%d", &operation);
+    } while ((operation != 1) && (operation != 2));
 
-        aob = getchar();
-        gets(rest);
+    printf("\n");
 
-    } while ((aob != 'y') && (aob != 'n'));
+    return operation;
+}
 
-    return (aob == 'y');
+void fList()
+{
+    FILE *csvLibraryL;
+    char c;
+
+    csvLibraryL = fopen("teste_ls.csv", "r");
+    if (csvLibraryL == NULL)
+    {
+        fputs("File Error\n", stderr);
+        exit(2);
+    }
+
+    while ((c = getc(csvLibraryL)) != EOF)
+    {
+        printf("%c", c);
+    }
+};
+
+void fUpdate()
+{
+    FILE *csvLibraryU;
+    char borrowOrReturn;
+    char booksName[256];
+    int booksQuantity = 0;
+
+    csvLibraryU = fopen("teste_ls.csv", "r");
+    if (csvLibraryU == NULL)
+    {
+        fputs("File Error\n", stderr);
+        exit(3);
+    }
+
+    long lSize;
+    char *buffer;
+    size_t result;
+
+    // obtain file size:
+    fseek(csvLibraryU, 0, SEEK_END);
+    lSize = ftell(csvLibraryU);
+    rewind(csvLibraryU);
+
+    // allocate memory to contain the whole file:
+    buffer = (char *)malloc(sizeof(char) * lSize);
+    if (buffer == NULL)
+    {
+        fputs("Memory error", stderr);
+        exit(4);
+    }
+
+    // copy the file into the buffer:
+    result = fread(buffer, 1, lSize, csvLibraryU);
+    if (result != lSize)
+    {
+        fputs("Reading error", stderr);
+        exit(5);
+    }
+
+    printf("%s\n\n", buffer);
+
+    char *matrixLines[256];
+    int n = 0, countLines = 0;
+
+    matrixLines[n] = strtok(buffer, "\n");
+    while (matrixLines[n] != NULL)
+    {
+        printf("s:%s n:%d\n", matrixLines[n], n);
+        n++;
+        matrixLines[n] = strtok(NULL, "\n");
+
+        countLines++;
+    }
+
+    struct stBooks
+    {
+        char *bName;
+        int bQuantity;
+    };
+
+    struct stBooks bookAndQuantities[countLines];
+
+    for (int i = 0; i < countLines; i++)
+    {
+        bookAndQuantities->bName = strtok(matrixLines[i], ",");
+        bookAndQuantities->bQuantity = atoi(strtok(NULL, "\0"));
+    }
+
+    printf("b - To borrow a book;\nr - To return a book\n\n");
+
+    do
+    {
+        borrowOrReturn = getchar();
+    } while ((borrowOrReturn != 'b') && (borrowOrReturn != 'r'));
+
+    printf("\n");
+
+    switch (borrowOrReturn)
+    {
+    case 'b':
+        printf("What is the book's name?\n");
+        gets(booksName);
+        printf("\n");
+
+        printf("How many?\n");
+        scanf("%d", &booksQuantity);
+        break;
+
+    case 'r':
+        printf("txo\n");
+        break;
+
+    default:
+        printf("txu\n");
+        break;
+    }
 }
